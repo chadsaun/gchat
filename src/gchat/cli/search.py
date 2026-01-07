@@ -17,13 +17,13 @@ app = typer.Typer(help="Search messages")
 @app.command("search")
 def search_messages(
     space_id: Annotated[str, typer.Argument(help="Space ID to search in")],
-    keyword: Annotated[str | None, typer.Argument(help="Keyword to search for")] = None,
-    sender: Annotated[str | None, typer.Option("--from", help="Filter by sender name/email")] = None,
-    after: Annotated[str | None, typer.Option("--after", help="Messages after date (YYYY-MM-DD)")] = None,
-    before: Annotated[str | None, typer.Option("--before", help="Messages before date (YYYY-MM-DD)")] = None,
-    num: Annotated[int, typer.Option("-n", "--num", help="Max results")] = 25,
-    account: Annotated[str | None, typer.Option("--account", "-a", help="Account to use")] = None,
-    format: Annotated[str, typer.Option("--format", "-f", help="Output format")] = "table",
+    keyword: Annotated[str | None, typer.Argument(help="Keyword to search")] = None,
+    sender: Annotated[str | None, typer.Option("--from")] = None,
+    after: Annotated[str | None, typer.Option("--after", help="YYYY-MM-DD")] = None,
+    before: Annotated[str | None, typer.Option("--before", help="YYYY-MM-DD")] = None,
+    num: Annotated[int, typer.Option("-n", "--num")] = 25,
+    account: Annotated[str | None, typer.Option("--account", "-a")] = None,
+    format: Annotated[str, typer.Option("--format", "-f")] = "table",
 ) -> None:
     """Search messages in a space.
 
@@ -52,7 +52,7 @@ def search_messages(
 
     # Require at least one filter
     if not any([keyword, sender, after_dt, before_dt]):
-        print_error("At least one search filter is required (keyword, --from, --after, or --before)")
+        print_error("At least one filter required (keyword, --from, --after, --before)")
         raise typer.Exit(1)
 
     try:

@@ -6,9 +6,9 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from gchat.models.space import Space
 from gchat.models.message import Message
-from gchat.utils.errors import SpaceNotFoundError, NetworkError
+from gchat.models.space import Space
+from gchat.utils.errors import NetworkError, SpaceNotFoundError
 
 
 class ChatClient:

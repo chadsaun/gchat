@@ -8,11 +8,10 @@ import typer
 from rich.panel import Panel
 
 from gchat import __version__
-from gchat.cli import account, spaces, messages, search
+from gchat.cli import account, messages, search, spaces
 from gchat.core.accounts import AccountManager
-from gchat.core.auth import AuthManager
-from gchat.ui.console import console, print_success, print_error, print_info
 from gchat.ui import prompts
+from gchat.ui.console import console, print_error, print_info, print_success
 from gchat.utils.errors import GChatError, NoActiveAccountError
 from gchat.utils.paths import GCHAT_DIR
 

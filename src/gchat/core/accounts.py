@@ -4,12 +4,12 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
-from gchat.core.config import Config
 from gchat.core.auth import AuthManager
 from gchat.core.client import ChatClient
+from gchat.core.config import Config
 from gchat.models.account import Account
-from gchat.utils.paths import get_account_dir, ACCOUNTS_DIR
 from gchat.utils.errors import AccountNotFoundError, NoActiveAccountError
+from gchat.utils.paths import get_account_dir
 
 
 class AccountManager:
@@ -25,7 +25,7 @@ class AccountManager:
         auth.setup_credentials_file(credentials_path)
 
         # Run OAuth flow
-        creds = auth.authenticate()
+        auth.authenticate()
 
         # Create account record
         account = Account(

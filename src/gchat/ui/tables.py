@@ -5,9 +5,8 @@ from datetime import datetime
 from rich.table import Table
 
 from gchat.models.account import Account
-from gchat.models.space import Space, SpaceType
 from gchat.models.message import Message
-from gchat.ui.console import console
+from gchat.models.space import Space, SpaceType
 
 
 def format_accounts_table(accounts: list[Account], active_name: str | None) -> Table:

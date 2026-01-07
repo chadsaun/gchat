@@ -8,9 +8,9 @@ import typer
 from rich.panel import Panel
 
 from gchat.core.accounts import AccountManager
-from gchat.ui.console import console, print_success, print_error, print_info
-from gchat.ui.tables import format_accounts_table
 from gchat.ui import prompts
+from gchat.ui.console import console, print_error, print_info, print_success
+from gchat.ui.tables import format_accounts_table
 from gchat.utils.errors import AccountNotFoundError, GChatError
 
 app = typer.Typer(help="Manage Google Chat accounts")
@@ -42,7 +42,8 @@ def add_account(
         console.print()
         console.print(
             Panel(
-                "[bold]To authenticate, you need a credentials.json file from Google Cloud Console.[/bold]\n\n"
+                "[bold]To authenticate, you need a credentials.json file "
+                "from Google Cloud Console.[/bold]\n\n"
                 "1. Go to [link]https://console.cloud.google.com/apis/credentials[/link]\n"
                 "2. Create OAuth 2.0 Client ID (Desktop app)\n"
                 "3. Download the JSON file",

@@ -1,13 +1,13 @@
 """Configuration management."""
 
+import tomllib
 from dataclasses import dataclass, field
 from datetime import datetime
-from pathlib import Path
-import tomllib
+
 import tomli_w
 
-from gchat.utils.paths import CONFIG_FILE, GCHAT_DIR, ensure_directories
 from gchat.models.account import Account
+from gchat.utils.paths import CONFIG_FILE, ensure_directories
 
 
 @dataclass

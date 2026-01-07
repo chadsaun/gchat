@@ -6,9 +6,9 @@ from typing import Annotated
 import typer
 
 from gchat.core.accounts import AccountManager
-from gchat.ui.console import console, print_success, print_error, print_info
-from gchat.ui.tables import format_messages_table
 from gchat.ui import prompts
+from gchat.ui.console import console, print_error, print_info, print_success
+from gchat.ui.tables import format_messages_table
 from gchat.utils.errors import GChatError
 
 app = typer.Typer()
@@ -16,12 +16,12 @@ app = typer.Typer()
 
 @app.command("send")
 def send_message(
-    space_id: Annotated[str | None, typer.Argument(help="Space ID to send to")] = None,
+    space_id: Annotated[str | None, typer.Argument(help="Space ID")] = None,
     message: Annotated[str | None, typer.Argument(help="Message text")] = None,
-    interactive: Annotated[bool, typer.Option("-i", "--interactive", help="Interactive mode")] = False,
-    no_confirm: Annotated[bool, typer.Option("--no-confirm", help="Skip confirmation")] = False,
-    account: Annotated[str | None, typer.Option("--account", "-a", help="Account to use")] = None,
-    format: Annotated[str, typer.Option("--format", "-f", help="Output format")] = "table",
+    interactive: Annotated[bool, typer.Option("-i", "--interactive")] = False,
+    no_confirm: Annotated[bool, typer.Option("--no-confirm")] = False,
+    account: Annotated[str | None, typer.Option("--account", "-a")] = None,
+    format: Annotated[str, typer.Option("--format", "-f")] = "table",
 ) -> None:
     """Send a message to a Google Chat space."""
     manager = AccountManager()

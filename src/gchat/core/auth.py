@@ -3,12 +3,12 @@
 import json
 from pathlib import Path
 
-from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-from gchat.utils.paths import get_credentials_file, get_token_file, get_account_dir
 from gchat.utils.errors import AuthenticationError, ConfigurationError
+from gchat.utils.paths import get_account_dir, get_credentials_file, get_token_file
 
 # OAuth scopes for Google Chat
 SCOPES = [
@@ -110,7 +110,7 @@ class AuthManager:
         self.account_dir.mkdir(parents=True, exist_ok=True)
 
         # Copy the credentials file
-        with open(source, "r") as f:
+        with open(source) as f:
             creds_data = json.load(f)
 
         with open(self.credentials_path, "w") as f:
