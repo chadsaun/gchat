@@ -36,9 +36,16 @@ class Space:
         except ValueError:
             space_type = SpaceType.UNKNOWN
 
+        # membershipCount is a dict like {"joinedDirectHumanUserCount": 4}
+        membership = data.get("membershipCount", {})
+        if isinstance(membership, dict):
+            member_count = membership.get("joinedDirectHumanUserCount")
+        else:
+            member_count = membership
+
         return cls(
             name=data.get("name", ""),
             display_name=data.get("displayName", data.get("name", "Unknown")),
             space_type=space_type,
-            member_count=data.get("membershipCount"),
+            member_count=member_count,
         )

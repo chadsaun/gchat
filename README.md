@@ -28,7 +28,7 @@ brew install gchat
 ### From source
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/gchat.git
+git clone https://github.com/chadsaun/gchat.git
 cd gchat
 pip install -e .
 ```
