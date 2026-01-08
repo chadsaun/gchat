@@ -89,8 +89,8 @@ class ChatClient:
         filter_str = " AND ".join(filters) if filters else None
 
         try:
-            messages = []
-            page_token = None
+            messages: list[Message] = []
+            page_token: str | None = None
 
             while len(messages) < limit:
                 page_size = min(100, limit - len(messages))
