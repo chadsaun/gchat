@@ -40,6 +40,23 @@ cd gchat
 pip install -e .
 ```
 
+## Updating
+
+To update to the latest version:
+
+```bash
+# If installed with pipx
+pipx upgrade gchat-cli
+
+# If installed with pip
+pip install --upgrade gchat-cli
+
+# If installed with Homebrew
+brew upgrade gchat
+```
+
+Check your current version with `gchat --version`.
+
 ## Quick Start
 
 ### 1. Set up Google Cloud credentials
