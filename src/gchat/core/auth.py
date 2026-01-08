@@ -7,7 +7,8 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-from gchat.utils.errors import AuthenticationError, ConfigurationError
+from gchat.utils.errors import AuthenticationError, ConfigurationError, NetworkError
+from gchat.utils.network import retry_on_network_error
 from gchat.utils.paths import get_account_dir, get_credentials_file, get_token_file
 
 # OAuth scopes for Google Chat
@@ -36,9 +37,15 @@ class AuthManager:
 
         if creds and creds.expired and creds.refresh_token:
             try:
-                creds.refresh(Request())
+
+                def _refresh() -> None:
+                    creds.refresh(Request())
+
+                retry_on_network_error(_refresh, context="refreshing credentials")
                 self._save_credentials(creds)
                 return creds
+            except NetworkError:
+                raise  # Re-raise network errors with their helpful messages
             except Exception as e:
                 raise AuthenticationError(
                     f"Failed to refresh credentials: {e}. Try re-authenticating."
@@ -88,7 +95,11 @@ class AuthManager:
             if creds and creds.valid:
                 return True
             if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
+
+                def _refresh() -> None:
+                    creds.refresh(Request())
+
+                retry_on_network_error(_refresh, context="checking authentication")
                 self._save_credentials(creds)
                 return True
             return False

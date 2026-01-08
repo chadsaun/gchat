@@ -13,6 +13,7 @@ from gchat.core.accounts import AccountManager
 from gchat.ui import prompts
 from gchat.ui.console import console, print_error, print_info, print_success
 from gchat.utils.errors import GChatError, NoActiveAccountError
+from gchat.utils.network import check_connectivity, get_dns_servers
 from gchat.utils.paths import GCHAT_DIR
 
 app = typer.Typer(
@@ -161,6 +162,75 @@ def status(
         else:
             print_info("No active account configured.")
             console.print("Run [bold]gchat init[/bold] to set up an account.")
+
+
+@app.command()
+def doctor(
+    format: Annotated[str, typer.Option("--format", "-f", help="Output format")] = "table",
+) -> None:
+    """Diagnose network connectivity issues.
+
+    Checks connectivity to Google APIs and OAuth endpoints.
+    """
+    console.print()
+    console.print("[bold]Running network diagnostics...[/bold]")
+    console.print()
+
+    results = check_connectivity()
+    all_passed = all(r["success"] for r in results)
+
+    if format == "json":
+        dns_servers = get_dns_servers()
+        data = {
+            "endpoints": results,
+            "dns_servers": dns_servers,
+            "all_passed": all_passed,
+        }
+        console.print_json(json.dumps(data))
+    else:
+        # Display results as a table
+        for result in results:
+            if result["success"]:
+                status = "[green]\u2713[/green]"
+                detail = f"[dim]{result['latency_ms']}ms[/dim]"
+            else:
+                status = "[red]\u2717[/red]"
+                detail = f"[red]{result['error']}[/red]"
+
+            console.print(
+                f"  {status} [bold]{result['description']}[/bold] "
+                f"({result['hostname']}:{result['port']})"
+            )
+            if not result["success"]:
+                console.print(f"      {detail}")
+            else:
+                console.print(f"      {detail}")
+
+        console.print()
+
+        # Show DNS servers
+        dns_servers = get_dns_servers()
+        if dns_servers:
+            console.print("[bold]DNS servers:[/bold]")
+            for server in dns_servers:
+                console.print(f"  {server}")
+            console.print()
+
+        # Summary
+        if all_passed:
+            print_success("All connectivity checks passed!")
+        else:
+            failed = [r for r in results if not r["success"]]
+            print_error(f"{len(failed)} check(s) failed.")
+            console.print()
+            console.print("[bold]Troubleshooting tips:[/bold]")
+            console.print("  1. Flush DNS cache:")
+            console.print("     [dim]macOS:[/dim] sudo dscacheutil -flushcache; "
+                          "sudo killall -HUP mDNSResponder")
+            console.print("     [dim]Linux:[/dim] resolvectl flush-caches")
+            console.print("  2. Check if a VPN or firewall is blocking connections")
+            console.print("  3. Try using a different DNS server (e.g., 8.8.8.8)")
+            console.print("  4. Check your internet connection")
 
 
 if __name__ == "__main__":

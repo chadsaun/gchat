@@ -9,6 +9,7 @@ from googleapiclient.errors import HttpError
 from gchat.models.message import Message
 from gchat.models.space import Space
 from gchat.utils.errors import NetworkError, SpaceNotFoundError
+from gchat.utils.network import retry_on_network_error
 
 
 class ChatClient:
@@ -25,7 +26,9 @@ class ChatClient:
 
             while True:
                 request = self.service.spaces().list(pageSize=100, pageToken=page_token)
-                response = request.execute()
+                response = retry_on_network_error(
+                    request.execute, context="listing spaces"
+                )
 
                 for space_data in response.get("spaces", []):
                     spaces.append(Space.from_api(space_data))
@@ -37,7 +40,7 @@ class ChatClient:
             return spaces
 
         except HttpError as e:
-            raise NetworkError(f"Failed to list spaces: {e}")
+            raise NetworkError.from_exception(e, "listing spaces")
 
     def get_space(self, space_id: str) -> Space:
         """Get details of a specific space."""
@@ -45,29 +48,30 @@ class ChatClient:
         space_name = space_id if space_id.startswith("spaces/") else f"spaces/{space_id}"
 
         try:
-            response = self.service.spaces().get(name=space_name).execute()
+            request = self.service.spaces().get(name=space_name)
+            response = retry_on_network_error(request.execute, context="getting space")
             return Space.from_api(response)
         except HttpError as e:
             if e.resp.status == 404:
                 raise SpaceNotFoundError(f"Space not found: {space_id}")
-            raise NetworkError(f"Failed to get space: {e}")
+            raise NetworkError.from_exception(e, "getting space")
 
     def send_message(self, space_id: str, text: str) -> Message:
         """Send a text message to a space."""
         space_name = space_id if space_id.startswith("spaces/") else f"spaces/{space_id}"
 
         try:
-            response = (
+            request = (
                 self.service.spaces()
                 .messages()
                 .create(parent=space_name, body={"text": text})
-                .execute()
             )
+            response = retry_on_network_error(request.execute, context="sending message")
             return Message.from_api(response)
         except HttpError as e:
             if e.resp.status == 404:
                 raise SpaceNotFoundError(f"Space not found: {space_id}")
-            raise NetworkError(f"Failed to send message: {e}")
+            raise NetworkError.from_exception(e, "sending message")
 
     def list_messages(
         self,
@@ -100,7 +104,9 @@ class ChatClient:
                     pageToken=page_token,
                     filter=filter_str,
                 )
-                response = request.execute()
+                response = retry_on_network_error(
+                    request.execute, context="listing messages"
+                )
 
                 for msg_data in response.get("messages", []):
                     messages.append(Message.from_api(msg_data))
@@ -116,7 +122,7 @@ class ChatClient:
         except HttpError as e:
             if e.resp.status == 404:
                 raise SpaceNotFoundError(f"Space not found: {space_id}")
-            raise NetworkError(f"Failed to list messages: {e}")
+            raise NetworkError.from_exception(e, "listing messages")
 
     def search_messages(
         self,
