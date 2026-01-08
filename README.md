@@ -19,9 +19,16 @@ A command-line interface for Google Chat. Send messages, read conversations, and
 pip install gchat-cli
 ```
 
+### Using pipx (recommended)
+
+```bash
+pipx install gchat-cli
+```
+
 ### Using Homebrew (macOS)
 
 ```bash
+brew tap chadsaun/tap
 brew install gchat
 ```
 
