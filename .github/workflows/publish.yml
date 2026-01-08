@@ -73,28 +73,25 @@ jobs:
     env:
       VERSION: ${{ needs.build.outputs.version }}
     steps:
-      - name: Wait for PyPI to be available
-        run: |
-          echo "Waiting for gchat-cli $VERSION on PyPI..."
-          for i in {1..30}; do
-            if curl -s "https://pypi.org/pypi/gchat-cli/$VERSION/json" | grep -q "$VERSION"; then
-              echo "Version $VERSION is available on PyPI"
-              exit 0
-            fi
-            echo "Attempt $i: Not yet available, waiting 10s..."
-            sleep 10
-          done
-          echo "Timeout waiting for PyPI"
-          exit 1
-
-      - name: Get package SHA256
+      - name: Wait for PyPI and get SHA256
         id: sha
         run: |
           URL="https://files.pythonhosted.org/packages/source/g/gchat-cli/gchat_cli-${VERSION}.tar.gz"
-          echo "Downloading from $URL"
-          SHA=$(curl -sL "$URL" | sha256sum | cut -d' ' -f1)
-          echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
-          echo "SHA256: $SHA"
+          EMPTY_SHA="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+
+          echo "Waiting for gchat-cli $VERSION tarball on PyPI..."
+          for i in {1..30}; do
+            SHA=$(curl -sL "$URL" | sha256sum | cut -d' ' -f1)
+            if [ "$SHA" != "$EMPTY_SHA" ] && [ -n "$SHA" ]; then
+              echo "Package available with SHA256: $SHA"
+              echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Attempt $i: File not yet available, waiting 10s..."
+            sleep 10
+          done
+          echo "Timeout waiting for PyPI tarball"
+          exit 1
 
       - name: Update Homebrew formula
         uses: actions/github-script@v7
